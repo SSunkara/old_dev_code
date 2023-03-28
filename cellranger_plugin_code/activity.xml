@@ -1,0 +1,69 @@
+<!DOCTYPE Activity SYSTEM "https://profiler.genedata.com/dtd/activity_plugin_1.7.dtd">
+<Activity id="Cell_Ranger_multi_parallel" name="Cell Ranger multi_parallel" path="10x_Custom" description="Cell Ranger multi: Plugin running cellranger multi. Cell Ranger is a set of analysis pipelines that process Chromium single cell data. The cellranger multi pipeline takes FASTQ files for any combination of 5' single cell gene expression, Feature Barcode (cell surface protein or antigen) and V(D)J libraries from a single GEM well.">
+    <Settings help_link="Cell_Ranger_multi.pdf" icon="iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAALHRFWHRDcmVhdGlvbiBUaW1lAFdlZCAyMyBGZWIgMjAxMSAxNzoxODo0MiArMDEwMBCUQQAAAAAHdElNRQfmCRMMIBDCXAWdAAAACXBIWXMAAArwAAAK8AFCrDSYAAAABGdBTUEAALGPC/xhBQAAAwBQTFRFAAAAgAAAAIAAgIAAAACAgACAAICAwMDAwNzApsrwRnaa/wD/rcLS1uHoAAAAAAAAy+L3k7XPMVJrgKjGAAAAAAAAAAAAAAAA/wD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vwoKCkgICA/wAAAP8A//8AAAD//wD/AP//////AAAA26D/BgAAAAx0Uk5T//////////////8AEt/OzgAAAE1JREFUeNplj1sKACAIBPdXu/91JVcN0YZCHPIRzgJ+ihYWlAkhBIYlsqqFiKbQwYHaQCnAEREMFJ5kyugC9gRvlYwXf4815dujf5urX4WzVgzFi3O+AAAAAElFTkSuQmCC">
+        <ExitCodes>
+            <ExitCode min="0" max="0"
+                level="success"
+                message="Success" />
+            <ExitCode min="1" max="255"
+                level="error"
+                message="Something went wrong."
+                print_output="true" />
+        </ExitCodes>
+    </Settings>
+    <Inputs samples="NUMBER_FILES_PER_SAMPLE">
+        <Input type="sequences" />
+    </Inputs>
+    <Outputs samples="NUMBER_FILES_PER_SAMPLE">
+        <Output type="sequences" keep_input_data="true" />
+    </Outputs>
+    <PreCommand interpreter="custom" custom_interpreter_path="var/custom_plugins/Cell_Ranger_multi_parallel/python" threads="1" memory="2G">pre.py</PreCommand>
+    <Command interpreter="custom" custom_interpreter_path="var/custom_plugins/Cell_Ranger_multi_parallel/python" threads="16" memory="100G">main.py</Command>
+    <PostCommand interpreter="custom" custom_interpreter_path="var/custom_plugins/Cell_Ranger_multi_parallel/python" threads="1" memory="2G">post.py</PostCommand>
+    <Form>
+        <Tab name="GENERAL" label="General">
+            <IntegerField name="NUMBER_FILES_PER_SAMPLE" label="Files per Sample" value="6" min="1" />
+            <FileChoosingField name="SAMPLE_SHEET" label="Sample Sheet (TSV)" required_value="true" file_choosing_mode="file" dialog_mode="open" />
+            <StringField name="SAMPLE_ID_COLUMN" label="Sample Name Column" value="Sample ID" />
+            <GroupWithBooleanField name="POST_COMMAND_EXPORT_RESULTS" label="Export Results">
+                <FileChoosingField name="POST_COMMAND_EXPORT_FOLDER" label="Export Folder" file_choosing_mode="folder"
+                    dialog_mode="save" required_value="true" />
+                <BooleanField name="POST_COMMAND_EXPORT_EXCLUDE_BAM" label="Exclude BAM Files" />
+            </GroupWithBooleanField>
+            <VersionField name="plugin_version" label="Plugin Version" value="1.0.1" />
+            <VersionField name="cell_ranger_version" label="Cell Ranger Version" value="7.0.1" />
+        </Tab>
+        <Tab name="GENE_EXPRESSION" label="Gene Expression">
+            <GroupWithBooleanField name="GENE_EXPRESSION_LIBRARY" label="Gene Expression Library">
+                <StringField name="GEX_ID_COLUMN" label="FASTQ ID Column" value="GEX" />
+                <FileChoosingField name="GEX_REFERENCE" label="GEX Reference" required_value="true" file_choosing_mode="folder" dialog_mode="open" />
+                <BooleanField name="INCLUDE_INTRONS" label="Include Introns" true_value="true" false_value="false" value="true" />
+                <BooleanField name="NO_BAM" label="No BAM" true_value="true" false_value="false" value="false" />
+                <FileChoosingField name="CMO_SET" label="CMO Set (CSV)" required_value="false" file_choosing_mode="file" dialog_mode="open" />
+                <StringField name="CELL_COUNT_COLUMN" label="Cell Count Column" value="Cell Count" />
+            </GroupWithBooleanField>
+        </Tab>
+        <Tab name="VDJ" label="VDJ">
+            <GroupWithBooleanField name="VDJ_LIBRARY" label="VDJ Library">
+                <StringField name="VDJ_ID_COLUMN" label="FASTQ ID Column" value="VDJ" />
+                <FileChoosingField name="VDJ_REFERENCE" label="VDJ Reference" required_value="true" file_choosing_mode="folder" dialog_mode="open" />
+                <Options name="VDJ_LIBRARY_TYPE" label="VDJ Library Type" value="VDJ-T">
+                    <Option label="VDJ-T" value="VDJ-T" />
+                    <Option label="VDJ-B" value="VDJ-B" />
+                </Options>
+            </GroupWithBooleanField>
+        </Tab>
+        <Tab name="MULTIPLEXING_CAPTURE" label="Multiplexing Capture">
+            <GroupWithBooleanField name="MULTIPLEXING_CAPTURE_LIBRARY" label="Multiplexing Capture Library">
+                <StringField name="MULTIPLEXING_ID_COLUMN" label="FASTQ ID Column" value="FB" />
+                <StringField name="HASHING_TAG_COLUMN" label="HASHING TAG Column" value="Hashing Tag" />
+            </GroupWithBooleanField>
+        </Tab>
+        <Tab name="ANTIBODY_CAPTURE" label="Antibody Capture">
+            <GroupWithBooleanField name="ANTIBODY_CAPTURE_LIBRARY" label="Antibody Capture Library">
+                <StringField name="ANTIBODY_CAPTURE_ID_COLUMN" label="FASTQ ID Column" value="FB" />
+                <FileChoosingField name="FEATURE_REFERENCE" label="Feature Reference (CSV)" required_value="true" file_choosing_mode="file" dialog_mode="open" />
+            </GroupWithBooleanField>
+        </Tab>
+    </Form>
+</Activity>

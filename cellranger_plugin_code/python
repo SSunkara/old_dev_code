@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -e
+
+if [[ -z "$plugin_folder" ]]; then
+  export plugin_folder=$(dirname -- "$0")
+fi
+
+env_dir="$plugin_folder/conda_env"
+
+# Unpack the plugins's conda environment if needed
+if [[ ! -d $env_dir ]]
+then
+    mkdir "$env_dir"
+    tar -xzf "$plugin_folder"/conda_env.tar.gz -C "$env_dir"
+    "$env_dir"/bin/conda-unpack
+fi
+
+if [ -f "$plugin_folder/cellranger-7.0.1.tar.gz" ] && [ ! -d "$plugin_folder/cellranger-7.0.1" ]
+then
+    echo "Unpacking cellranger binaries..."
+    tar -xzf "$plugin_folder/cellranger-7.0.1.tar.gz" --directory "$plugin_folder"
+fi
+
+# Activate the custom environment
+source "$env_dir"/bin/activate
+
+# Extend default search path with plugin folder and utils
+export PYTHONPATH="$plugin_folder"
+
+if [[ -z "${CELLRANGER_DIR}" ]]; then
+  echo "Setting cellranger binary directory to '$plugin_folder/cellranger-7.0.1'."
+  export CELLRANGER_DIR="$plugin_folder/cellranger-7.0.1"
+
+  # export bamtofastq and samtools that are bundled with cellranger
+
+  export bamtofastq_exec="$CELLRANGER_DIR/lib/bin/bamtofastq"
+  export samtools="$CELLRANGER_DIR/external/anaconda/bin/samtools"
+  
+fi
+
+python "$@"
