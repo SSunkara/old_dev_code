@@ -81,7 +81,7 @@ def parse_metadata(met, metadatadict):
 
 
 #############################################################################################
-#### Read from Ruidong's masterfile
+#### Read info from Ruidong's project masterfile
 #### Expected format: Project,Data Type,Count Matrix,Sample Metadata
 #### Additional implementation - if folder in datalake already exists, do not create another
 #############################################################################################
