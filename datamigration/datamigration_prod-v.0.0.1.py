@@ -1,6 +1,6 @@
 #####################################################################################
 ##### Data migration tool to transfer data from on-prem to genedata datalake
-##### Sirisha Sunkara; sirisha.sunkara1@gilead.com; 01/18/2023
+##### Sirisha Sunkara; 01/18/2023
 ##### gdp client needs to be setup on-prem to talk to either the dev. or prod. server
 #####################################################################################
 
